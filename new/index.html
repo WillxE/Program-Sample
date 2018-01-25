@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>iCoffee</title>
+		<script src='https://icode.run/react.js'></script>
+		<script src='https://icode.run/react-dom.js'></script>
+		<script src='https://icode.run/babel.js'></script>
+        <link rel='stylesheet' href='https://icode.run/bootstrap.css'>
+	</head>
+	<body>
+        <div id='table1'></div>
+        <script type='text/babel'>
+            class CoffeeTable extends React.Component {
+                constructor() {
+                    super()
+                    this.coffee = []
+                    fetch('http://icode.run:4000/coffee')
+                    .then( r => r.json())
+                    .then( d => {
+                        this.coffee = d
+                        this.forceUpdate()
+                    })
+                }
+                render() {
+                    let button = []
+                    for (let c of this.coffee) {
+                        button.push(<button className='btn btn-primary'>{c}</button>)
+                    }
+                    return <div className='btn-group'>{button}</div>
+                }
+            }
+            let element = document.getElementById('table1')
+            ReactDOM.render(<CoffeeTable></CoffeeTable>,element)
+            </script>
+	</body>
+</html>

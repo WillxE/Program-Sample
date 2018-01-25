@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Demo</title>
+		<script src='https://icode.run/react.js'></script>
+		<script src='https://icode.run/react-dom.js'></script>
+		<script src='https://icode.run/babel.js'></script>
+		<link href='https://icode.run/bootstrap.css' rel="stylesheet">		
+	</head>
+	<body>
+		<div id='my-component' class='container'></div>
+
+		<script type='text/babel'>
+			class StockSearch extends React.Component {
+				read(list) {
+					let query = encodeURIComponent(`
+						select * from yahoo.finance.quotes where
+						symbol in ('${list}')`)
+					let url = `https://query.yahooapis.com/v1/public/yql?q=${query}` +
+						`&format=json&diagnostics=false` +
+						`&env=http://datatables.org/alltables.env` +
+						`&callback=`
+					return fetch(url)
+				}
+				render() {
+					let name = ''
+					let ask  = ''
+					let bid  = ''
+					let cap  = ''
+					let symbol = ''
+					let ebitda = ''
+					let peratio = ''
+					if (this.data) {
+						name    = this.data.query.results.quote.Name
+						ask     = this.data.query.results.quote.Ask
+						bid     = this.data.query.results.quote.Bid
+						cap     = this.data.query.results.quote.MarketCapitalization
+						symbol  = this.data.query.results.quote.Symbol
+						ebitda  = this.data.query.results.quote.EBITDA
+						peratio = this.data.query.results.quote.PERatio
+					}
+					return <div>
+                        <input className='form-control'
+							placeholder='Symbol'
+                            autoFocus
+							onChange={ e => this.search(e.target.value)} />
+						<br/>
+                        <table className='table'>
+                        <tr><td>Name:</td><td> {name}</td></tr>
+						<tr><td>Symbol:</td><td> {symbol}</td></tr>
+						<tr><td>Ask:</td><td> {ask}</td></tr>
+						<tr><td>Bid:</td><td> {bid}</td></tr>
+						<tr><td>Market Cap:</td><td> {cap}</td></tr>
+						<tr><td>EBITDA:</td><td> {ebitda}</td></tr>
+						<tr><td>PE/Ratio:</td><td> {peratio}</td></tr>
+                        </table>
+					</div>
+				}
+				search(symbol) {
+					this.read(symbol)
+					.then( r => r.json() )
+					.then( d => {
+						this.data = d
+						this.forceUpdate()
+					})
+				}
+			}
+			var element = document.getElementById('my-component')
+			ReactDOM.render(<StockSearch />, element)
+		</script>
+	</body>
+</html>

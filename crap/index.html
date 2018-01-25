@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Demo</title>
+		<script src='https://icode.run/react.js'></script>
+		<script src='https://icode.run/react-dom.js'></script>
+		<script src='https://icode.run/babel.js'></script>
+		<link href='https://icode.run/bootstrap.css' rel="stylesheet">		
+	</head>
+	<body>
+		<div id='my-component' class='container'></div>
+
+		<script type='text/babel'>
+			class StockSearch extends React.Component {
+				read(list) {
+					let query = encodeURIComponent(`
+						select * from yahoo.finance.quotes where
+						symbol in ('${list}')`)
+					let url = `https://query.yahooapis.com/v1/public/yql?q=${query}` +
+						`&format=json&diagnostics=false` +
+						`&env=http://datatables.org/alltables.env` +
+						`&callback=`
+					return fetch(url)
+				}
+				constructor() {
+					super()
+					this.data = [ ]
+					this.read('aapl,goog,msft')
+					.then( r => r.json() )
+					.then( d => {
+						this.data = d.query.results.quote
+						this.forceUpdate()
+					})
+				}
+				render() {
+					let content = [ ]
+					for (let d of this.data) {
+						content.push(<tr>
+                            <td>{d.Symbol}</td>
+                            <td>{d.Name}</td>
+                            <td>{d.MarketCapitalization}</td>
+                            <td>{d.EBITDA}</td>
+                            <td>{d.PERatio}</td>
+                            </tr>)
+                        
+					}
+                    return <table className='table'>
+                        <tr><th>Symbol</th><th>Name</th><th>MarketCap</th><th>EBITDA</th><th>PerRatio</th></tr>
+                        <tr><td>{content}</td></tr>
+                    </table>
+				}
+			}
+			var element = document.getElementById('my-component')
+			ReactDOM.render(<StockSearch />, element)
+		</script>
+	</body>
+</html>
